@@ -1,26 +1,27 @@
 <template>
-<app>
-  <LoginForm v-on:LoginFormEvent="LoginEvent"></LoginForm>
-  <p> {{ message}} </p>
-</app>
+  <login-form v-on:LoginFormEvent="LoginEvent"></login-form>
 </template>
 <script>
-import LoginForm from '../../components/LoginForm'
-
+import LoginForm from '../../components/LoginForm.vue'
 export default {
-  data () {
-    return {
-      // この値はコンポーネントLoginFormの実行によりセットされる
-      LoginFormReturnData: '',
-      message: ''
-    }
-  },
   components: {
     LoginForm
   },
+  middleware: 'must-not-be-authenticated',
   methods: {
-    LoginEvent (errorCode) {
-      alert (errorCode)
+    LoginEvent (resultCode, data) {
+      if (resultCode < 0) {
+        console.log("ログインに失敗しました")
+        this.$router.push({path: '/user/login'})
+      }
+      // storeにログイン情報をセット
+      console.log(resultCode, data)
+      this.$store.dispatch('setLoggedIn')
+      this.$store.dispatch('setEmail', data.user.email)
+      this.$store.dispatch('setFireID', data.user.uid)
+      
+      // rootページに遷移 
+      this.$router.push({path: '/'})
     }
   }
 }

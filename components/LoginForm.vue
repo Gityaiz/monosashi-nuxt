@@ -24,11 +24,13 @@
             >
             </v-text-field>
             <v-text-field
-              v-model="password"
+              :append-icon="visible ? 'visibility' : 'visibility_off'"
+              :type="visible ? 'text' : 'password'"
+              name="input-10-2"
               label="Password"
-              required
-            >
-            </v-text-field>
+              v-model="password"
+              @click:append="visible = !visible"
+            ></v-text-field>
             <v-layout
               align-center
               justify-center
@@ -54,7 +56,8 @@ export default {
   data () {
     return {
       username: '',
-      password: ''
+      password: '',
+      visible: false
     }
 
   },
@@ -65,10 +68,9 @@ export default {
       }
       firebase.auth().signInWithEmailAndPassword(this.username, this.password)
         .then((data) => {
-          console.log('success email login');
+          this.$emit('LoginFormEvent', 0, data);
         }).catch((error) => {
-          console.log(error.code);
-          this.$emit('LoginFormEvent', error.code);
+          this.$emit('LoginFormEvent', -1, error.code);
         })
     }
   }
