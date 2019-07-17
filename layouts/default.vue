@@ -34,8 +34,8 @@
         <router-link to="/" class="toolbar-font">{{ title }}</router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <router-link to="/user/login" v-if="this.$store.getters.isLoggedIn == false" class="toolbar-font">ログイン</router-link>
-      <router-link to='/user' v-else  class="toolbar-font"></router-link>{{ this.$store.getters.email.value}} さん</router-link>
+      <router-link to="/user/login" v-if="this.$store.getters['auth/email'] == ''" class="toolbar-font">ログイン</router-link>
+      <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link>
     </v-toolbar>
     <v-content>
       <v-container>

@@ -12,8 +12,9 @@ export default {
     logout () {
       firebase.auth().signOut()
         .then(data => {
-          this.$store.dispatch('setLogOut')
-          this.$store.dispatch('setEmail', '')
+          this.$store.dispatch('auth/setLogOut')
+          this.$store.dispatch('auth/setEmail', '')
+          this.$store.dispatch('auth/setFireID', '')
           this.$router.push({path: '/'})
           console.log("ログアウトしました")
         })

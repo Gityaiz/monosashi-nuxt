@@ -16,9 +16,8 @@ export default {
       }
       // storeにログイン情報をセット
       console.log(resultCode, data)
-      this.$store.dispatch('setLoggedIn')
-      this.$store.dispatch('setEmail', data.user.email)
-      this.$store.dispatch('setFireID', data.user.uid)
+      this.$store.dispatch('auth/setEmail', data.user.email)
+      this.$store.dispatch('auth/setFireID', data.user.uid)
       
       // rootページに遷移 
       this.$router.push({path: '/'})
