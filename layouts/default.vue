@@ -37,6 +37,12 @@
       <router-link to="/user/login" v-if="this.$store.getters['auth/email'] == ''" class="toolbar-font">ログイン</router-link>
       <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link>
     </v-toolbar>
+    <v-snackbar
+      top
+      v-model='snackbarVisible'
+    >
+      {{ this.$store.getters['snackbar/message'] }}
+    </v-snackbar>
     <v-content>
       <v-container>
         <nuxt />
@@ -53,11 +59,23 @@
 
 <script>
 export default {
+  computed: {
+    // snackbarが自動でfalseに設定するためセッタを用意して、明示的にdispatchからOffするようにする
+    snackbarVisible: {
+      get() {
+        return this.$store.state.snackbar.isEnable
+      },
+      set() {
+        return this.$store.dispatch('snackbar/snackOff')
+      }
+    }
+  },
   data() {
     return {
       clipped: false,
       drawer: false,
       fixed: false,
+      isSnackbar: false,
       items: [
         {
           icon: 'home',

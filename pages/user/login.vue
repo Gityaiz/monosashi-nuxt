@@ -18,7 +18,8 @@ export default {
       console.log(resultCode, data)
       this.$store.dispatch('auth/setEmail', data.user.email)
       this.$store.dispatch('auth/setFireID', data.user.uid)
-      
+      this.$store.dispatch('snackbar/setMessage', 'ログインに成功しました')
+      this.$store.dispatch('snackbar/snackOn')
       // rootページに遷移 
       this.$router.push({path: '/'})
     }
