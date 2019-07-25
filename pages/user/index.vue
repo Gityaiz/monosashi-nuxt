@@ -1,17 +1,40 @@
 <template>
 <v-app>
-  <v-btn @click="logout">ログアウト</v-btn>
   <v-btn @click="getStatus">ユーザ情報の表示</v-btn>
-  <div v-if="isVisible">
-    <v-card-text>
-      <v-subheader class="pa-0">ユーザー名</v-subheader>
-      <v-text-field
-        v-model="update.name"
-        :label="user_infos.name"
-      ></v-text-field>
-    </v-card-text>
-    <v-btn @click="updateStatus">ユーザ情報を更新する</v-btn>
-  </div>
+  <v-divider></v-divider>
+  <v-layout wrap v-if="isVisible">
+    <v-flex
+      shrink
+      pa-1
+    >
+      <v-card
+        dark
+      >
+        <label class="profile_graph">
+          プロフィール画像を選択してください
+          <input type="file" @change="selectFile"/>
+        </label>
+      </v-card>
+    </v-flex>
+    <v-flex
+      pa-1
+    >
+      <v-btn @click="updateStatus(), updateProfileGraph()" block>ユーザ情報を更新する</v-btn>    
+      <v-card
+        dark
+      >
+        <v-card-text>
+          <div display=flex;>
+          <v-subheader class="pa-0">ユーザー名</v-subheader>
+          <v-text-field
+            v-model="update.name"
+            :label="user_infos.name"
+          ></v-text-field>
+          </div>
+        </v-card-text>
+      </v-card> 
+    </v-flex>
+  </v-layout>
 </v-app>
 </template>
 
@@ -27,21 +50,11 @@ export default {
       uid: '',
       update: {
         name: ''
-      }
+      },
+      profileGraph: ''
     }
   },
   methods: {
-    logout () {
-      firebase.auth().signOut()
-        .then(data => {
-          this.$store.dispatch('auth/setLogOut')
-          this.$store.dispatch('auth/setEmail', '')
-          this.$store.dispatch('auth/setFireID', '')
-          this.$store.dispatch('snackbar/setMessage', 'ログアウトしました')
-          this.$store.dispatch('snackbar/snackOn')
-          this.$router.push({path: '/'})
-        })
-    },
     getStatus () {
       if (this.isfirst) {
         firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
@@ -62,7 +75,8 @@ export default {
       }
     },
     updateStatus () {
-      if (this.user_infos.name === this.update.name || this.update.name === null) {
+      console.log('updateStatus is called')
+      if (this.user_infos.name === this.update.name || this.update.name === '') {
         return
       }
       firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
@@ -71,9 +85,67 @@ export default {
         }).then(data => {
           this.$store.dispatch('snackbar/setMessage', 'ユーザ名を更新しました')
           this.$store.dispatch('snackbar/snackOn')
-          this.$router.push({path: '/'})
+        })
+    },
+    selectFile (e) {
+      e.preventDefault();
+      let files = e.target.files;
+      this.profileGraph = files[0];
+      console.log(this.profileGraph)
+    },
+    updateProfileGraph () {
+      console.log('updateProgileGraph is called!! ')
+      if ( !!this.uploadFile === '' ) {
+        return
+      }
+      console.log('updateProgileGraph is called!! ')
+      const uid = this.$store.state.auth.fireid
+      const storepath = 'userProfile' + uid + '/' + this.profileGraph.name
+      firebase.storage().ref().child(storepath).put(this.profileGraph)
+        .then(function (snapshot) {
+            firebase.firestore().collection('users').doc(uid)
+              .get().then(function(doc) {
+                if (doc.profileGraph) {
+                  firebase.firestore().collection('users').doc(uid).update({
+                    profileGraph: storepath
+                  })
+                  console.log('ストアのプロフィール画像のパスを更新しました')
+                } else {
+                  firebase.firestore().collection('users').doc(uid).set({
+                    profileGraph: storepath
+                  }, {merge: true})
+                  console.log('新たにプロフィール画像を追加しました')
+                }
+              })
         })
     }
   }
 }
 </script>
+<style lang="scss">
+
+.profile_graph {
+  input {
+    display: none;
+  }
+}
+
+.profile_graph {
+  display: flex;
+  width: 200px;
+  height: 200px;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+  border: solid 1px #888;
+  cursor: pointer;
+  cursor: hand;
+} 
+
+.profile_graph::after {
+  content: '+';
+  font-size: 1rem;
+  color: #888;
+  padding-left: 1rem;
+}
+</style>

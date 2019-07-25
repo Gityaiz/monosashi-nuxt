@@ -35,7 +35,29 @@
       </v-toolbar-title>
       <v-spacer></v-spacer>
       <router-link to="/user/login" v-if="this.$store.getters['auth/email'] == ''" class="toolbar-font">ログイン</router-link>
-      <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link>
+      <v-menu
+        bottom
+        offset-y
+        v-if="!this.$store.getters['auth/email'] == ''"
+      >
+        <template v-slot:activator="{ on }">
+          <v-btn
+            v-on="on"
+            text
+            depressed
+            class="toolbar-font"
+          >{{ $store.getters['auth/email'] }} </v-btn>
+        </template>
+        <v-list
+          v-for="(item, i) in userItems"
+          :key="i"
+        >
+          <v-list-tile @click="userMenu(item.title)">
+            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+      <!-- <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link> -->
     </v-toolbar>
     <v-snackbar
       top
@@ -58,6 +80,7 @@
 </template>
 
 <script>
+import firebase from '~/plugins/firebase.js'
 export default {
   computed: {
     // snackbarが自動でfalseに設定するためセッタを用意して、明示的にdispatchからOffするようにする
@@ -88,6 +111,16 @@ export default {
           to: '/user'
         }
       ],
+      userItems: [
+        {
+          title: 'ユーザーページ',
+          link: '/users'
+        },
+        {
+          title: 'ログアウト',
+          link: ''
+        }
+      ],
       miniVariant: false,
       right: true,
       rightDrawer: false,
@@ -98,6 +131,26 @@ export default {
         }
       }
     }
+  },
+  methods: {
+    userMenu (selectedMenu) {
+      console.log('userMenu called', selectedMenu)
+      if (selectedMenu === 'ユーザーページ') {
+        this.$router.push({path: '/user'})
+      }
+
+      if (selectedMenu === 'ログアウト') {
+        firebase.auth().signOut()
+          .then(data => {
+            this.$store.dispatch('auth/setLogOut')
+            this.$store.dispatch('auth/setEmail', '')
+            this.$store.dispatch('auth/setFireID', '')
+            this.$store.dispatch('snackbar/setMessage', 'ログアウトしました')
+            this.$store.dispatch('snackbar/snackOn')
+            this.$router.push({path: '/'})
+          })
+      }
+    }
   }
 }
 </script>
@@ -105,5 +158,11 @@ export default {
 .toolbar-font {
   color: white;
   text-decoration: none;
+  text-transform: none;
+}
+
+.userMenu-item {
+  cursor: pointer;
+  cursor: hand;
 }
 </style>
