@@ -134,7 +134,6 @@ export default {
   },
   methods: {
     userMenu (selectedMenu) {
-      console.log('userMenu called', selectedMenu)
       if (selectedMenu === 'ユーザーページ') {
         this.$router.push({path: '/user'})
       }

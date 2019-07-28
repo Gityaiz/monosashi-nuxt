@@ -75,7 +75,6 @@ export default {
       }
     },
     updateStatus () {
-      console.log('updateStatus is called')
       if (this.user_infos.name === this.update.name || this.update.name === '') {
         return
       }
@@ -91,31 +90,23 @@ export default {
       e.preventDefault();
       let files = e.target.files;
       this.profileGraph = files[0];
-      console.log(this.profileGraph)
     },
     updateProfileGraph () {
-      console.log('updateProgileGraph is called!! ')
-      if ( !!this.uploadFile === '' ) {
+      if ( this.profileGraph === '' ) {
         return
       }
-      console.log('updateProgileGraph is called!! ')
       const uid = this.$store.state.auth.fireid
-      const storepath = 'userProfile' + uid + '/' + this.profileGraph.name
+      const storepath = 'userProfile' + '/' + uid + '/' + this.profileGraph.name
       firebase.storage().ref().child(storepath).put(this.profileGraph)
-        .then(function (snapshot) {
+        .then((snapshot) => {
             firebase.firestore().collection('users').doc(uid)
-              .get().then(function(doc) {
-                if (doc.profileGraph) {
-                  firebase.firestore().collection('users').doc(uid).update({
-                    profileGraph: storepath
-                  })
-                  console.log('ストアのプロフィール画像のパスを更新しました')
-                } else {
+              .get().then((doc) => {
                   firebase.firestore().collection('users').doc(uid).set({
                     profileGraph: storepath
                   }, {merge: true})
-                  console.log('新たにプロフィール画像を追加しました')
-                }
+                this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
+                this.$store.dispatch('snackbar/snackOn')
+                this.$router.push({path: '/'})
               })
         })
     }

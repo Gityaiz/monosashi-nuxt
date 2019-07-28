@@ -10,10 +10,12 @@ export default {
   methods: {
     signupEvent (resultCode, data) {
       if (resultCode < 0) {
-        console.log("ユーザーの作成に失敗しました")
+        this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
+        this.$store.dispatch('snackbar/snackOn')
         this.$router.push({path: '/user/signup'})
       }
-      console.log("data:",data)
+      this.$store.dispatch('snackbar/setMessage', 'ユーザーを作成しました')
+      this.$store.dispatch('snackbar/snackOn')
       this.$router.push({path: '/user/login'})
     }
   }

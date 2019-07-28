@@ -43,7 +43,9 @@
                 login
               </v-btn>
             </v-layout>
-
+            <div align="right">
+            <router-link to="/user/signup" class="no-decorate-font">アカウントをお持ちではないですか？</router-link>
+            </div>
           </v-flex>
         </v-layout>
       </v-card>
@@ -76,3 +78,15 @@ export default {
   }
 }
 </script>
+<style>
+.no-decorate-font {
+  color: white;
+  text-decoration : underline;
+}
+
+.no-decorate-font:hover {
+  color: rgb(84, 177, 243);
+  text-decoration : underline;
+}
+
+</style>

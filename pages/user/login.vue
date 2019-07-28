@@ -11,11 +11,11 @@ export default {
   methods: {
     LoginEvent (resultCode, data) {
       if (resultCode < 0) {
-        console.log("ログインに失敗しました")
+        this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
+        this.$store.dispatch('snackbar/snackOn')
         this.$router.push({path: '/user/login'})
       }
       // storeにログイン情報をセット
-      console.log(resultCode, data)
       this.$store.dispatch('auth/setEmail', data.user.email)
       this.$store.dispatch('auth/setFireID', data.user.uid)
       this.$store.dispatch('snackbar/setMessage', 'ログインに成功しました')

@@ -54,7 +54,9 @@
                 Create Account
               </v-btn>
             </v-layout>
-
+            <div align="right">
+            <router-link to="/user/login" class="no-decorate-font">ログインはこちら</router-link>
+            </div>
           </v-flex>
         </v-layout>
       </v-card>
@@ -90,7 +92,7 @@ export default {
       firebase.auth().createUserWithEmailAndPassword(this.username, this.password)
         .then(data => {
           this.$emit('SignupFormEvent', 0, data);
-        }).catch(function (error) {
+        }).catch((error) => {
           this.username = ''
           this.password = ''
           this.confirm_password = ''
@@ -100,3 +102,15 @@ export default {
   }
 }
 </script>
+<style>
+.no-decorate-font {
+  color: white;
+  text-decoration : underline;
+}
+
+.no-decorate-font:hover {
+  color: rgb(84, 177, 243);
+  text-decoration : underline;
+}
+
+</style>
