@@ -82,6 +82,7 @@ export default {
         .update({
           name: this.update.name 
         }).then(data => {
+          this.$store.dispatch('auth/setName', this.update.name)
           this.$store.dispatch('snackbar/setMessage', 'ユーザ名を更新しました')
           this.$store.dispatch('snackbar/snackOn')
         })
@@ -95,6 +96,7 @@ export default {
       if ( this.profileGraph === '' ) {
         return
       }
+      // このあたりの処理はストアの中でやったほうがよい？
       const uid = this.$store.state.auth.fireid
       const storepath = 'userProfile' + '/' + uid + '/' + this.profileGraph.name
       firebase.storage().ref().child(storepath).put(this.profileGraph)
@@ -104,6 +106,7 @@ export default {
                   firebase.firestore().collection('users').doc(uid).set({
                     profileGraph: storepath
                   }, {merge: true})
+                this.$store.dispatch('auth/setProfileImage', storepath)
                 this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
                 this.$store.dispatch('snackbar/snackOn')
                 this.$router.push({path: '/'})
