@@ -1,4 +1,5 @@
-import firebase from '~/plugins/firebase.js'
+
+export const strict = false
 
 // stateはfunction形式で記述しないと複数人で同じ値になってしまう場合がある
 export const state = () => ({
@@ -31,19 +32,23 @@ export const mutations = {
     state.email = value
   },
   setLogOut (state) {
+    state.name = ''
     state.email = ''
+    state.fireid = ''
+    state.profileImageUrl = ''
+
   },
   setFireID (state, value) {
     state.fireid = value
   },
-  async setProfileImageUrl (state, value) {
-    let imageUrl
-    await firebase.storage().ref()
-      .child(value).getDownloadURL().then((url) => {
-        imageUrl = url
-      })
-    state.profileImageUrl = imageUrl
+  setProfileImageUrl (state, value) {
+    state.profileImageUrl = value
+  },
+
+  initializeState (state, value) {
+
   }
+
 }
 
 export const actions = {
@@ -59,7 +64,7 @@ export const actions = {
   setFireID ({commit}, value) {
     commit('setFireID', value)
   },
-  setProfileImage ({commit}, value) {
+  setProfileImageUrl ({commit}, value) {
     commit('setProfileImageUrl', value)
   }
 }

@@ -19,7 +19,7 @@
     <v-flex
       pa-1
     >
-      <v-btn @click="updateStatus(), updateProfileGraph()" block>ユーザ情報を更新する</v-btn>    
+      <v-btn @click="updateStatus(), updateProfileImage()" block>ユーザ情報を更新する</v-btn>
       <v-card
         dark
       >
@@ -51,7 +51,7 @@ export default {
       update: {
         name: ''
       },
-      profileGraph: ''
+      profileImage: ''
     }
   },
   methods: {
@@ -90,28 +90,29 @@ export default {
     selectFile (e) {
       e.preventDefault();
       let files = e.target.files;
-      this.profileGraph = files[0];
+      this.profileImage = files[0];
     },
-    updateProfileGraph () {
-      if ( this.profileGraph === '' ) {
+    async updateProfileImage () {
+      if ( this.profileImage === '' ) {
         return
       }
-      // このあたりの処理はストアの中でやったほうがよい？
-      const uid = this.$store.state.auth.fireid
-      const storepath = 'userProfile' + '/' + uid + '/' + this.profileGraph.name
-      firebase.storage().ref().child(storepath).put(this.profileGraph)
-        .then((snapshot) => {
-            firebase.firestore().collection('users').doc(uid)
-              .get().then((doc) => {
-                  firebase.firestore().collection('users').doc(uid).set({
-                    profileGraph: storepath
-                  }, {merge: true})
-                this.$store.dispatch('auth/setProfileImage', storepath)
-                this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
-                this.$store.dispatch('snackbar/snackOn')
-                this.$router.push({path: '/'})
-              })
+
+      const storepath = 'userProfile' + '/' + this.$store.state.auth.fireid + '/' + this.profileImage.name
+      await firebase.storage().ref().child(storepath).put(this.profileImage)
+      .then((snapshot) => {
+        firebase.firestore().collection('users').doc(this.$store.state.auth.fireid).set({
+          profileImage: storepath
+        }, {merge: true})
+      })
+      let imageUrl
+      await firebase.storage().ref()
+        .child(storepath).getDownloadURL().then((url) => {
+          imageUrl = url
         })
+      this.$store.dispatch('auth/setProfileImageUrl', imageUrl)
+      this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
+      this.$store.dispatch('snackbar/snackOn')
+      this.$router.push({path: '/'})
     }
   }
 }

@@ -19,7 +19,7 @@
           <v-layout row>
             <v-flex xs12>
               <v-text-field
-                label="本文"
+                label="メッセージを入力しよう"
                 textarea
                 v-model="sendMessage"
               ></v-text-field>
@@ -45,11 +45,9 @@
       <v-card color="grey darken-4" flat>
         <v-list two-line >
           <template v-for="(item, index) in threadData">
-            <!-- <v-subheader v-if="item.author" :key="`A-${index}`">{{ item.author }}</v-subheader> -->
             <v-list-tile :key="`C-${index}`" avatar>
               <v-list-tile-avatar>
                 <img :src="item.profileImage">
-                <!-- <img src="https:firebasestorage.googleapis.com/v0/b/sample-project-987bf.appspot.com/o/userProfile%2FbPiThri3a8WWecId5IyjU2TCa3B3%2Flogin.PNG?alt=media&token=3c2e8024-d206-488c-b8b5-7d2fe76aadc4"> -->
               </v-list-tile-avatar>
               <v-list-tile-content>
                 <v-list-tile-title v-html="item.author"></v-list-tile-title>
@@ -79,14 +77,17 @@ export default {
   created () {
     firebase.firestore().collection('chat-room').doc('public')
       .collection('messages').orderBy('timestamp', 'asc').onSnapshot(querySnapshot => {
-        querySnapshot.forEach(doc => {
-          this.threadData.unshift({
-              author: doc.data().author,
-              authorid: doc.data().authorid,
-              profileImage: doc.data().profileImage,
-              data: doc.data().message,
-              timestamp: doc.data().timestamp
-          })
+        querySnapshot.docChanges().forEach(change => {
+          console.log('doc:', change.type)
+          if (change.type ==='added') {
+            this.threadData.unshift({
+                author: change.doc.data().author,
+                authorid: change.doc.data().authorid,
+                profileImage: change.doc.data().profileImage,
+                data: change.doc.data().message,
+                timestamp: change.doc.data().timestamp
+            })
+          }
         })
       })
   },
