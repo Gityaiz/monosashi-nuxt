@@ -1,15 +1,25 @@
 <template>
 <v-container grid-list-md >
   <v-layout row>
-    <v-flex sm6 offset-sm3 >
+    <v-flex xs12 >
+
+
+      <v-text-field
+        append-icon="search"
+        :append-icon-cb="search"
+        label="フリーワードで移動先を選択する"
+        solo-inverted
+        class="mx-3"
+        flat
+        v-model='searchKeyword'
+      ></v-text-field>
 
       <v-card color="grey darken-4" flat>
-
         <v-flex xs8>
           <v-text-field
             id="testing"
             label="名前"
-            :value="this.$store.getters['auth/name']"
+            :value="$store.state.auth.name"
             disabled
           >
           </v-text-field>
@@ -25,9 +35,7 @@
               ></v-text-field>
             </v-flex>
           </v-layout>
-        </v-container>
         
-        <v-flex offset-xs8>
           <v-card-actions>
             <v-btn 
               outline
@@ -38,10 +46,11 @@
               投稿
             </v-btn>
           </v-card-actions>
-        </v-flex>
-
+        </v-container>
       </v-card>
-
+      <v-alert :value="true" outline :color="alertColor" :icon="alertIcon">
+        {{ alertText}}
+      </v-alert>
       <v-card color="grey darken-4" flat>
         <v-list two-line >
           <template v-for="(item, index) in threadData">
@@ -72,24 +81,16 @@ export default {
     return {
       threadData: [],
       sendMessage: '',
+      active: null,
+      searchKeyword: '',
+      alertColor: '', // color の取る値   success => 緑  info => 青  warning => 黄色  error => 赤 (その他色)
+      alertIcon: '',  // icon の取る値   check_circle => レ点    info => i  priority_high => !〇  warning => !△
+      alertText: ''
     }
   },
   created () {
-    firebase.firestore().collection('chat-room').doc('public')
-      .collection('messages').orderBy('timestamp', 'asc').onSnapshot(querySnapshot => {
-        querySnapshot.docChanges().forEach(change => {
-          console.log('doc:', change.type)
-          if (change.type ==='added') {
-            this.threadData.unshift({
-                author: change.doc.data().author,
-                authorid: change.doc.data().authorid,
-                profileImage: change.doc.data().profileImage,
-                data: change.doc.data().message,
-                timestamp: change.doc.data().timestamp
-            })
-          }
-        })
-      })
+    this.initInfo ()
+    this.openThread ('public')
   },
   methods: {
     addComment () {
@@ -109,6 +110,56 @@ export default {
       // 投稿メッセージは空にする    
       this.sendMessage = ''
     },
+    initInfo () {
+      this.threadData = []
+      this.sendMessage = ''
+      this.active = null
+    },
+    openThread (docName) {
+      this.initInfo()
+      firebase.firestore().collection('chat-room').doc(docName)
+        .collection('messages').orderBy('timestamp', 'asc').onSnapshot(querySnapshot => {
+          querySnapshot.docChanges().forEach(change => {
+            console.log('doc:', change.type)
+            if (change.type ==='added') {
+              this.threadData.unshift({
+                  author: change.doc.data().author,
+                  authorid: change.doc.data().authorid,
+                  profileImage: change.doc.data().profileImage,
+                  data: change.doc.data().message,
+                  timestamp: change.doc.data().timestamp
+              })
+            }
+          })
+        })
+      this.alertColor = 'info'
+      this.alertIcon = 'info'
+      this.alertText = docName + 'にアクセスしています'
+    },
+    search () {
+      if (this.searchKeyword === '') {
+        return
+      }
+      firebase.firestore().collection('chat-room').doc(this.searchKeyword).get()
+        .then(doc => {
+          if (!doc.exists) {
+            firebase.firestore().collection('chat-room').doc(this.searchKeyword).collection('messages').doc().set({
+              author: this.$store.state.auth.name,
+              authorid: this.$store.state.auth.fireid,
+              profileImage: this.$store.state.auth.profileImageUrl,
+              message: 'スレッドを作成しました',
+              timestamp: new Date()
+            })
+            this.$store.dispatch('snackbar/setMessage', '新たにスレッドを作成しました')
+            this.$store.dispatch('snackbar/snackOn')
+            this.openThread(this.searchKeyword)
+            this.searchKeyword = ''
+            return
+          } else {
+            this.openThread(this.searchKeyword)
+          }
+      })
+    }
   }
 }
 </script>
