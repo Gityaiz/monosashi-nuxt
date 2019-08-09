@@ -25,10 +25,12 @@
     "@vue/test-utils": "^1.0.0-beta.27",
     "ava": "^1.0.1",
     "browser-env": "^3.2.5",
+    "node-sass": "^4.12.0",
     "nodemon": "^1.18.9",
     "require-extension-hooks": "^0.3.3",
     "require-extension-hooks-babel": "^0.1.1",
     "require-extension-hooks-vue": "^2.0.0",
+    "sass-loader": "^7.2.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.2"
   }
