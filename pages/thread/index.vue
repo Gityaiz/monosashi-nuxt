@@ -1,16 +1,14 @@
 <template>
 <v-container grid-list-md >
-  <v-layout row>
+  <v-layout row　wrap>
     <v-flex xs12 >
 
       <v-alert :value="true" outline :color="alertColor" :icon="alertIcon">
         {{ alertText}}
       </v-alert>
 
-      <v-btn @click='openThread($store.state.contents.topic)'>aaa</v-btn>
-
       <v-card color="grey darken-4" flat>
-        <v-flex xs8>
+        <v-flex xs12>
           <v-text-field
             id="testing"
             label="名前"
@@ -27,6 +25,8 @@
                 label="メッセージを入力しよう"
                 textarea
                 v-model="sendMessage"
+                @keyup.enter="submitSearchKeyword"
+								@keypress="setCanSubmit"
               ></v-text-field>
             </v-flex>
           </v-layout>
@@ -80,6 +80,7 @@ export default {
       alertIcon: '',  // icon の取る値   check_circle => レ点    info => i  priority_high => !〇  warning => !△
       alertText: '',
       openedTopic:'',
+      canSubmit: false,
     }
   },
   computed: {
@@ -89,7 +90,11 @@ export default {
   },
   methods: {
     addComment () {
+      console.log('sendMessage => ', this.sendMessage)
+      // 送信時のEnterが入ってしまうためnullとならないので改行を削除する
+      this.sendMessage = this.sendMessage.replace(/\r?\n/g, '');
       if (this.sendMessage === '') {
+        console.log('sendMessage => null')
         return
       }
       
@@ -97,7 +102,7 @@ export default {
         .collection('messages').doc().set({
           author: this.$store.state.auth.name,
           authorid: this.$store.state.auth.fireid,
-          profileImage: this.$store.state.auth.profileImageUrl,
+          profileImage: this.$store.state.auth.profileImage,
           message: this.sendMessage,
           timestamp: new Date()
         })  
@@ -115,7 +120,6 @@ export default {
       firebase.firestore().collection('chat-room').doc(docName)
         .collection('messages').orderBy('timestamp', 'asc').onSnapshot(querySnapshot => {
           querySnapshot.docChanges().forEach(change => {
-            console.log('doc:', change.type)
             if (change.type ==='added') {
               this.threadData.unshift({
                   author: change.doc.data().author,
@@ -137,12 +141,15 @@ export default {
         return
       }
       firebase.firestore().collection('chat-room').doc(keyword).get()
-        .then(doc => {
-          if (!doc.exists) {
+        .then(documentSnapshot => {
+          if (!documentSnapshot.exists) {
+            firebase.firestore().collection('chat-room').doc(keyword).set({
+              created: new Date(),
+            })
             firebase.firestore().collection('chat-room').doc(keyword).collection('messages').doc().set({
               author: this.$store.state.auth.name,
               authorid: this.$store.state.auth.fireid,
-              profileImage: this.$store.state.auth.profileImageUrl,
+              profileImage: this.$store.state.auth.profileImage,
               message: 'スレッドを作成しました',
               timestamp: new Date()
             })
@@ -154,7 +161,17 @@ export default {
             this.openThread(keyword)
           }
       })
-    }
+    },
+    submitSearchKeyword () {
+			if(!this.canSubmit) {
+				return
+			}
+      this.canSubmit = false
+      this.addComment()
+		},
+		setCanSubmit () {
+			this.canSubmit = true
+		}
   }
 }
 </script>

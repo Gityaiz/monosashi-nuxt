@@ -44,7 +44,7 @@ export default {
         })
       
       this.$store.dispatch('auth/setName', this.user_infos.name)
-      this.$store.dispatch('auth/setProfileImageUrl', this.user_infos.profileImage)
+      this.$store.dispatch('auth/setProfileImage', this.user_infos.profileImage)
 
       // rootページに遷移 
       this.$router.push({path: '/'})

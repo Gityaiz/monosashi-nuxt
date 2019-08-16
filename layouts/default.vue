@@ -1,5 +1,6 @@
 <template>
   <v-app dark>
+  <!--
     <v-navigation-drawer
       v-model="drawer"
       :mini-variant="miniVariant"
@@ -24,12 +25,13 @@
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
+    -->
     <v-toolbar
       :clipped-left="clipped"
       fixed
       app
     >
-      <v-toolbar-side-icon @click="drawer = !drawer" />
+      <!-- <v-toolbar-side-icon @click="drawer = !drawer" /> -->
       <v-toolbar-title>
         <router-link to="/" class="toolbar-font">{{ title }}</router-link>
       </v-toolbar-title>
@@ -57,7 +59,7 @@
           </v-list-tile>
         </v-list>
       </v-menu>
-      <!-- <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link> -->
+      <router-link to='/user' v-else  class="toolbar-font">{{ this.$store.getters['auth/email'] }} </router-link>
     </v-toolbar>
     <v-snackbar
       top
@@ -124,7 +126,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'Vuetify.js',
+      title: 'もっとTalk！',
       methods: {
         moveToRoot () {
           this.$router.push({path: '/'})
@@ -156,12 +158,12 @@ export default {
 <style>
 .toolbar-font {
   color: white;
+  font-size: 150%;
   text-decoration: none;
   text-transform: none;
 }
 
 .userMenu-item {
-  cursor: pointer;
   cursor: hand;
 }
 </style>

@@ -6,7 +6,7 @@ export const state = () => ({
   name: {},
   email: {},
   fireid: {},
-  profileImageUrl: {},
+  profileImage: {},
 })
 
 export const getters = {
@@ -20,7 +20,7 @@ export const getters = {
     return state.fireid
   },
   profileImage: state => {
-    return state.profileImageUrl
+    return state.profileImage
   }
 }
 
@@ -35,14 +35,14 @@ export const mutations = {
     state.name = ''
     state.email = ''
     state.fireid = ''
-    state.profileImageUrl = ''
+    state.profileImage = ''
 
   },
   setFireID (state, value) {
     state.fireid = value
   },
-  setProfileImageUrl (state, value) {
-    state.profileImageUrl = value
+  setProfileImage (state, value) {
+    state.profileImage = value
   },
 
   initializeState (state, value) {
@@ -64,8 +64,8 @@ export const actions = {
   setFireID ({commit}, value) {
     commit('setFireID', value)
   },
-  setProfileImageUrl ({commit}, value) {
-    commit('setProfileImageUrl', value)
+  setProfileImage ({commit}, value) {
+    commit('setProfileImage', value)
   }
 }
 

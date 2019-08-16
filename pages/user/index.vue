@@ -2,27 +2,19 @@
 <v-app>
   <v-btn @click="getStatus">ユーザ情報の表示</v-btn>
   <v-divider></v-divider>
-  <v-layout wrap v-if="isVisible">
-    <v-flex
-      shrink
-      pa-1
-    >
-      <v-card
-        dark
-      >
-        <label class="profile_graph">
-          プロフィール画像を選択してください
+  <v-layout row wrap v-if="isVisible">
+    <v-flex>
+        <v-btn @click="updateStatus(), updateProfileImage()" block>ユーザ情報を更新する</v-btn>
+        <v-layout column align-center>
+          <v-avatar :tile="false" size="300px" color="grey lighten-4">
+            <img :src="user_infos.profileImage" alt="avatar">
+          </v-avatar>
+          <label class="profile_graph">
+          画像アップロード
           <input type="file" @change="selectFile"/>
         </label>
-      </v-card>
-    </v-flex>
-    <v-flex
-      pa-1
-    >
-      <v-btn @click="updateStatus(), updateProfileImage()" block>ユーザ情報を更新する</v-btn>
-      <v-card
-        dark
-      >
+        </v-layout>
+      <v-card dark>
         <v-card-text>
           <div display=flex;>
           <v-subheader class="pa-0">ユーザー名</v-subheader>
@@ -100,16 +92,18 @@ export default {
       const storepath = 'userProfile' + '/' + this.$store.state.auth.fireid + '/' + this.profileImage.name
       await firebase.storage().ref().child(storepath).put(this.profileImage)
       .then((snapshot) => {
-        firebase.firestore().collection('users').doc(this.$store.state.auth.fireid).set({
-          profileImage: storepath
-        }, {merge: true})
+        // 成功時の処理
       })
       let imageUrl
       await firebase.storage().ref()
         .child(storepath).getDownloadURL().then((url) => {
           imageUrl = url
         })
-      this.$store.dispatch('auth/setProfileImageUrl', imageUrl)
+      await firebase.firestore().collection('users').doc(this.$store.state.auth.fireid).set({
+        profileImage: imageUrl
+      }, {merge: true})
+
+      this.$store.dispatch('auth/setProfileImage', imageUrl)
       this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
       this.$store.dispatch('snackbar/snackOn')
       this.$router.push({path: '/'})
@@ -128,7 +122,7 @@ export default {
 .profile_graph {
   display: flex;
   width: 200px;
-  height: 200px;
+  height: 20px;
   padding: 20px;
   justify-content: center;
   align-items: center;
