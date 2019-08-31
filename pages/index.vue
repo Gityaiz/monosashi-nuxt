@@ -3,21 +3,15 @@
 		<v-container grid-list-md text-xs-center>
 			<v-layout justify-center align-center>
 				<v-flex xs12>
+						<v-progress-circular v-show="loading" :size="70" :width="7" indeterminate color="purple"></v-progress-circular>
 						<v-jumbotron
 							:src="this.topImageUrl"
 							dark
 							height=1000px
+							v-show="!loading" 
 						>
 							<v-container fill-height fluid>
 								<v-layout align-content-center fill-height wrap>
-								<!--
-									<v-flex xs1 offset-xs5>
-										<nuxt-link to="/" class="topMenu">Home</nuxt-link>
-									</v-flex>
-									<v-flex xs1>
-										<nuxt-link to="/user" class="topMenu">User</nuxt-link>
-									</v-flex>
-									-->
 									<v-flex text-xs-center xs12>
 										<span class="titleMessage">気になるキーワードで検索して友達と会話を楽しもう</span>
 										<v-text-field
@@ -51,15 +45,17 @@ export default {
       searchKeyword: '',
       topImageUrl: '',
 			canSubmit: false,
-      gradient: 'to top right, rgba(63,81,181, .7), rgba(25,32,72, .7)',
+			gradient: 'to top right, rgba(63,81,181, .7), rgba(25,32,72, .7)',
+			loading: true,
     }
   },
   created () {
     firebase.storage().ref().child('public/plane.png').getDownloadURL()
       .then ((url) => {
-        this.topImageUrl = url
-      })
-  },
+				this.topImageUrl = url
+				this.loading = false
+			})
+},
   methods: {
     search () {
       if (this.searchKeyword === '') {

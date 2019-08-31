@@ -97,7 +97,12 @@ export default {
         console.log('sendMessage => null')
         return
       }
-      
+
+      if (this.$store.state.auth.fireid === '') {
+        console.log('not authenticated')
+        this.sendMessage = ''
+        return
+      }
       firebase.firestore().collection('chat-room').doc(this.openedTopic)
         .collection('messages').doc().set({
           author: this.$store.state.auth.name,
@@ -143,6 +148,13 @@ export default {
       firebase.firestore().collection('chat-room').doc(keyword).get()
         .then(documentSnapshot => {
           if (!documentSnapshot.exists) {
+            // 未ログイン状態の場合スレッドの作成は認めない
+            if ( this.$store.state.auth.fireid === '') {
+              this.$store.dispatch('snackbar/setMessage', '新しいスレッドの作成はログイン済みの状態で行なってください')
+              this.$store.dispatch('snackbar/snackOn')
+              this.$router.push({path: '/'})
+              return
+            }
             firebase.firestore().collection('chat-room').doc(keyword).set({
               created: new Date(),
             })
@@ -158,6 +170,7 @@ export default {
             this.openThread(keyword)
             return
           } else {
+            // 未ログイン状態であってもスレッドメッセージの読み込みは許可する（特に条件分岐しない）
             this.openThread(keyword)
           }
       })

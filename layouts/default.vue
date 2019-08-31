@@ -126,7 +126,7 @@ export default {
       miniVariant: false,
       right: true,
       rightDrawer: false,
-      title: 'もっとTalk！',
+      title: 'なんでもTalk！',
       methods: {
         moveToRoot () {
           this.$router.push({path: '/'})
