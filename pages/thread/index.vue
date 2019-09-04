@@ -160,8 +160,10 @@ export default {
               this.$router.push({path: '/'})
               return
             }
+            // スレッドの最終更新日時をアップデート
             firebase.firestore().collection('chat-room').doc(keyword).set({
               created: new Date(),
+              updated: new Date(),
             })
             firebase.firestore().collection('chat-room').doc(keyword).collection('messages').doc().set({
               author: this.$store.state.auth.name,
@@ -170,6 +172,7 @@ export default {
               message: 'スレッドを作成しました',
               timestamp: new Date()
             })
+
             this.$store.dispatch('snackbar/setMessage', '新たにスレッドを作成しました')
             this.$store.dispatch('snackbar/snackOn')
             this.openThread(keyword)
