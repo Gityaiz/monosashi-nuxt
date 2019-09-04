@@ -110,7 +110,12 @@ export default {
           profileImage: this.$store.state.auth.profileImage,
           message: this.sendMessage,
           timestamp: new Date()
-        })  
+        })
+
+        // スレッドの最終更新日時をアップデート
+        firebase.firestore().collection('chat-room').doc(this.openedTopic).set({
+          updated: new Date(),
+        }, {merge: true})
 
       // 投稿メッセージは空にする    
       this.sendMessage = ''

@@ -57,10 +57,11 @@ export default {
 			})
 },
   methods: {
-    search () {
+    jumpToThreadPage () {
       if (this.searchKeyword === '') {
         return
       }
+			// ストアに検索キーワードをセットしてスレッドページに移動
 			this.$store.dispatch('contents/setTopic', this.searchKeyword)
 			this.searchKeyword = ''
 			this.$router.push({path: '/thread/'})
@@ -70,7 +71,7 @@ export default {
 				return
 			}
 			this.canSubmit = false
-			this.search()
+			this.jumpToThreadPage ()
 		},
 		setCanSubmit () {
 			this.canSubmit = true
