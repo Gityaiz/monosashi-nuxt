@@ -1,4 +1,5 @@
 import firebase from "firebase";
+import 'firebase/storage'
 
 // .env に設定した値を取得してる
 const config = {

@@ -1,15 +1,7 @@
 <template>
-  <v-layout
-    justify-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <v-card
-        color="blue-grey darken-2"
-      >
+  <v-layout justify-center>
+    <v-flex xs12 sm8 md6>
+      <v-card color="blue-grey darken-2">
         <v-layout column wrap>
           <v-flex pt-3 pb-3 pl-5 pr-5 ma-3>
             <v-card-title class="headline">
@@ -49,7 +41,7 @@
               <v-btn 
                 outline
                 color="primary"
-                @click="signupWithEmail"
+                @click="signupWithEmail(username, password, confirm_password)"
               >
                 Create Account
               </v-btn>
@@ -64,7 +56,7 @@
   </v-layout>
 </template>
 <script>
-import firebase from '~/plugins/firebase.js'
+import firebase from '../plugins/firebase.js'
 export default {
   data () {
     return {
@@ -81,22 +73,24 @@ export default {
     }
   },
   methods: {
-    signupWithEmail () {
-      if (this.username === '' || this.password === '' || this.confirm_password === '') {
+    signupWithEmail (username, password, confirm_password) {
+      if ( username === '' || password === '' || confirm_password === '') {
+        this.$emit('failed', 'any is blank');        
         return
       }
-      if ( this.password != this.confirm_password ) {
+      if ( password != confirm_password ) {
+        this.$emit('failed', 'password differs from confirm');        
         return
       }
 
-      firebase.auth().createUserWithEmailAndPassword(this.username, this.password)
+      return firebase.auth().createUserWithEmailAndPassword( username, password )
         .then(data => {
-          this.$emit('SignupFormEvent', 0, data);
+          this.$emit('success', data);
         }).catch((error) => {
           this.username = ''
           this.password = ''
           this.confirm_password = ''
-          this.$emit('SignupFormEvent', -1, error);
+          this.$emit('failed', error);
         })
     }
   }

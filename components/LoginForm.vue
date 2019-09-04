@@ -1,15 +1,7 @@
 <template>
-  <v-layout
-    justify-center
-  >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <v-card
-        color="blue-grey darken-2"
-      >
+  <v-layout justify-center>
+    <v-flex xs12 sm8 md6>
+      <v-card color="blue-grey darken-2">
         <v-layout column wrap>
           <v-flex pt-3 pb-3 pl-5 pr-5 ma-3>
             <v-card-title class="headline">
@@ -38,7 +30,7 @@
               <v-btn 
                 outline
                 color="primary"
-                @click="loginAction"
+                @click="loginAction(username, password)"
               >
                 login
               </v-btn>
@@ -53,7 +45,7 @@
   </v-layout>
 </template>
 <script>
-import firebase from '~/plugins/firebase.js'
+import firebase from '../plugins/firebase.js'
 export default {
   data () {
     return {
@@ -64,17 +56,19 @@ export default {
 
   },
   methods: {
-    loginAction () {
-      if (this.username === '' || this.password === '') {
+    loginAction (username, password) {
+      if (username === '' || password === '') {
+        this.$emit('failed', 'username or password is blank');
         return
       }
-      firebase.auth().signInWithEmailAndPassword(this.username, this.password)
+      return firebase.auth().signInWithEmailAndPassword(username, password)
         .then((data) => {
-          this.$emit('LoginFormEvent', 0, data);
-        }).catch((error) => {
-          this.$emit('LoginFormEvent', -1, error.code);
+          this.$emit('success', data);
         })
-    }
+        .catch((error) => {
+          this.$emit('failed', error);
+        })
+    },
   }
 }
 </script>

@@ -1,53 +1,60 @@
 <template>
-  <login-form v-on:LoginFormEvent="LoginEvent"></login-form>
+  <login-form @success="LoginSuccess" @failed="LoginFailed"></login-form>
 </template>
 <script>
 import LoginForm from '../../components/LoginForm.vue'
-import firebase from '~/plugins/firebase.js'
+import firebase from '../../plugins/firebase.js'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   components: {
     LoginForm
   },
-  data () {
-    return {
-      user_infos: '',
-    }
-  },
   middleware: 'must-not-be-authenticated',
+  computed: {
+    ...mapGetters("auth", [
+      "fireid",
+    ])
+  },
   methods: {
-    async LoginEvent (resultCode, data) {
-      if (resultCode < 0) {
-        this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
-        this.$store.dispatch('snackbar/snackOn')
-        this.$router.push({path: '/user/login'})
-      }
+    ...mapActions("auth", ["setName"]),
+    ...mapActions("auth", ["setEmail"]),
+    ...mapActions("auth", ["setFireID"]),
+    ...mapActions("auth", ["setProfileImage"]),
+    ...mapActions("snackbar", ["setMessage"]),
+    ...mapActions("snackbar", ["snackOn"]),
+
+    LoginSuccess (data) {
       // storeにログイン情報をセット
-      this.$store.dispatch('auth/setName', '名無し')
-      this.$store.dispatch('auth/setEmail', data.user.email)
-      this.$store.dispatch('auth/setFireID', data.user.uid)
-      this.$store.dispatch('snackbar/setMessage', 'ログインに成功しました')
-      this.$store.dispatch('snackbar/snackOn')
+      this.setName('名無し')
+      this.setEmail(data.user.email)
+      this.setFireID(data.user.uid)
 
       // ここでユーザー情報を取得する
-      await firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
+      return firebase.firestore().collection('users').doc(this.fireid)
         .get()
         .then(doc => {
           if (doc.exists) {
-              this.user_infos = doc.data()
+            let user_infos = doc.data()
+            this.setName(user_infos.name)
+            this.setProfileImage(user_infos.profileImage)
+            this.setMessage('ログインに成功しました')
+            this.snackOn()
+            // rootページに遷移 
+            this.$router.push({path: '/'})
           } else {
               // doc.data() will be undefined in this case
-              this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
-              this.$store.dispatch('snackbar/snackOn')
+              this.setMessage('エラーが発生しました')
+              this.snackOn()
               return
           }
         })
-      
-      this.$store.dispatch('auth/setName', this.user_infos.name)
-      this.$store.dispatch('auth/setProfileImage', this.user_infos.profileImage)
-
-      // rootページに遷移 
-      this.$router.push({path: '/'})
+    },
+    LoginFailed (data) {
+      // dataにサインイン失敗時のエラー内容が入っている
+      this.setMessage('エラーが発生しました')
+      this.snackOn()
+      this.$router.push({path: '/user/login'})
     }
   }
 }
