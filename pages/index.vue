@@ -1,45 +1,43 @@
 <template>
-	<v-app>
-		<v-container grid-list-md text-xs-center>
-			<v-layout justify-center align-center>
-				<v-flex xs12>
-						<v-progress-circular v-show="loading" :size="70" :width="7" indeterminate color="purple"></v-progress-circular>
-						<v-jumbotron
-							:src="this.topImageUrl"
-							dark
-							height=1000px
-							v-show="!loading" 
-						>
-							<v-container fill-height fluid>
-								<v-layout align-content-center fill-height wrap>
-									<v-flex text-xs-center xs12>
-										<span class="titleMessage">気になるキーワードで検索して友達と会話を楽しもう</span>
-										<v-text-field
-											append-icon="search"
-											:append-icon-cb="jumpToThreadPage"
-											label="話したいトピックを入力"
-											solo-inverted
-											flat
-											v-model='searchKeyword'
-											light
-											@keyup.enter="submitSearchKeyword"
-											@keypress="setCanSubmit"
-										></v-text-field>
-										<div class="trendArea-all">
-											<span class="trendarea-title"> 最新検索キーワード <br></span>
-											<v-divider></v-divider>
-											<div class="trendarea-keyword" v-on:click="jumpToThreadPage(item.name)" v-for="item in trendThreadref">
-												<span class="trendKeyword"> {{item.name}} <br></span>
-											</div>
+	<v-container grid-list-md text-xs-center>
+		<v-layout justify-center align-center>
+			<v-flex xs12>
+					<v-progress-circular v-show="loading" :size="70" :width="7" indeterminate color="purple"></v-progress-circular>
+					<v-jumbotron
+						:src="this.topImageUrl"
+						dark
+						height=1000px
+						v-show="!loading" 
+					>
+						<v-container fill-height fluid>
+							<v-layout align-content-center fill-height wrap>
+								<v-flex text-xs-center xs12>
+									<span class="titleMessage">気になるキーワードで検索して友達と会話を楽しもう</span>
+									<v-text-field
+										append-icon="search"
+										:append-icon-cb="jumpToThreadPage"
+										label="話したいトピックを入力"
+										solo-inverted
+										flat
+										v-model='searchKeyword'
+										light
+										@keyup.enter="submitSearchKeyword"
+										@keypress="setCanSubmit"
+									></v-text-field>
+									<div class="trendArea-all">
+										<span class="trendarea-title"> 最新検索キーワード <br></span>
+										<v-divider></v-divider>
+										<div class="trendarea-keyword" v-on:click="jumpToThreadPage(item.name)" v-for="item in trendThreadref">
+											<span class="trendKeyword"> {{item.name}} <br></span>
 										</div>
-									</v-flex>
-								</v-layout>
-							</v-container>
-						</v-jumbotron>
-				</v-flex>
-			</v-layout>
-		</v-container>
-	</v-app>
+									</div>
+								</v-flex>
+							</v-layout>
+						</v-container>
+					</v-jumbotron>
+			</v-flex>
+		</v-layout>
+	</v-container>
 </template>
 
 <script>

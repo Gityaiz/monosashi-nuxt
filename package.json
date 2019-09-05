@@ -1,11 +1,26 @@
 {
   "name": "talkAnything",
+  "jest": {
+    "moduleNameMapper": {
+      "^vue$": "vue/dist/vue.common.js"
+    },
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "vue"
+    ],
+    "transform": {
+      "^.+\\.js$": "<rootDir>/node_modules/babel-jest",
+      ".*\\.(vue)$": "<rootDir>/node_modules/jest-vue-preprocessor"
+    },
+    "verbose": true
+  },
   "version": "1.0.0",
   "description": "My epic Nuxt.js project",
   "author": "yiz",
   "private": true,
   "scripts": {
-    "test": "ava",
+    "test": "jest",
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
@@ -22,9 +37,14 @@
     "vuex-persistedstate": "^2.5.4"
   },
   "devDependencies": {
-    "@vue/test-utils": "^1.0.0-beta.27",
+    "@vue/test-utils": "^1.0.0-beta.29",
     "ava": "^1.0.1",
+    "babel-jest": "^24.9.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-vue-app": "^2.0.0",
     "browser-env": "^3.2.5",
+    "jest": "^24.9.0",
+    "jest-vue-preprocessor": "^1.5.0",
     "node-sass": "^4.12.0",
     "nodemon": "^1.18.9",
     "require-extension-hooks": "^0.3.3",
@@ -32,6 +52,8 @@
     "require-extension-hooks-vue": "^2.0.0",
     "sass-loader": "^7.2.0",
     "stylus": "^0.54.5",
-    "stylus-loader": "^3.0.2"
+    "stylus-loader": "^3.0.2",
+    "vue-jest": "^3.0.4",
+    "vue-test-utils": "^1.0.0-beta.11"
   }
 }

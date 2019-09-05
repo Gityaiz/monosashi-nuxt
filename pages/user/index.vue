@@ -1,33 +1,33 @@
 <template>
-<v-app>
-  <v-btn @click="getStatus">ユーザ情報の表示</v-btn>
-  <v-divider></v-divider>
-  <v-layout row wrap v-if="isVisible">
-    <v-flex>
-        <v-btn @click="updateStatus(), updateProfileImage()" block>ユーザ情報を更新する</v-btn>
-        <v-layout column align-center>
-          <v-avatar :tile="false" size="300px" color="grey lighten-4">
-            <img :src="user_infos.profileImage" alt="avatar">
-          </v-avatar>
-          <label class="profile_graph">
-          画像アップロード
-          <input type="file" @change="selectFile"/>
-        </label>
-        </v-layout>
-      <v-card dark>
-        <v-card-text>
-          <div display=flex;>
-          <v-subheader class="pa-0">ユーザー名</v-subheader>
-          <v-text-field
-            v-model="update.name"
-            :label="user_infos.name"
-          ></v-text-field>
-          </div>
-        </v-card-text>
-      </v-card> 
-    </v-flex>
-  </v-layout>
-</v-app>
+  <div>
+    <v-btn @click="getStatus">ユーザ情報の表示</v-btn>
+    <v-divider></v-divider>
+    <v-layout row wrap v-if="isVisible">
+      <v-flex>
+          <v-btn @click="updateStatus(), updateProfileImage()" block>ユーザ情報を更新する</v-btn>
+          <v-layout column align-center>
+            <v-avatar :tile="false" size="300px" color="grey lighten-4">
+              <img :src="user_infos.profileImage" alt="avatar">
+            </v-avatar>
+            <label class="profile_graph">
+            画像アップロード
+            <input type="file" @change="selectFile"/>
+          </label>
+          </v-layout>
+        <v-card dark>
+          <v-card-text>
+            <div display=flex;>
+            <v-subheader class="pa-0">ユーザー名</v-subheader>
+            <v-text-field
+              v-model="update.name"
+              :label="user_infos.name"
+            ></v-text-field>
+            </div>
+          </v-card-text>
+        </v-card> 
+      </v-flex>
+    </v-layout>
+  </div>
 </template>
 
 <script>

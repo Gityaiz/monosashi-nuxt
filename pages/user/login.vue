@@ -1,5 +1,5 @@
 <template>
-  <login-form v-on:LoginFormEvent="LoginEvent"></login-form>
+  <login-form @success="LoginSuccess" @failed="LoginFailed"></login-form>
 </template>
 <script>
 import LoginForm from '../../components/LoginForm.vue'
@@ -16,12 +16,7 @@ export default {
   },
   middleware: 'must-not-be-authenticated',
   methods: {
-    async LoginEvent (resultCode, data) {
-      if (resultCode < 0) {
-        this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
-        this.$store.dispatch('snackbar/snackOn')
-        this.$router.push({path: '/user/login'})
-      }
+    async LoginSuccess (data) {
       // storeにログイン情報をセット
       this.$store.dispatch('auth/setName', '名無し')
       this.$store.dispatch('auth/setEmail', data.user.email)
@@ -42,12 +37,16 @@ export default {
               return
           }
         })
-      
       this.$store.dispatch('auth/setName', this.user_infos.name)
       this.$store.dispatch('auth/setProfileImage', this.user_infos.profileImage)
 
       // rootページに遷移 
       this.$router.push({path: '/'})
+    },
+    LoginFailed (data) {
+      this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
+      this.$store.dispatch('snackbar/snackOn')
+      this.$router.push({path: '/user/login'})
     }
   }
 }
