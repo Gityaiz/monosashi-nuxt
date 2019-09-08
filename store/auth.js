@@ -3,10 +3,10 @@ export const strict = false
 
 // stateはfunction形式で記述しないと複数人で同じ値になってしまう場合がある
 export const state = () => ({
-  name: {},
-  email: {},
-  fireid: {},
-  profileImage: {},
+  name: '',
+  email: '',
+  fireid: '',
+  profileImage: '',
 })
 
 export const getters = {
@@ -36,7 +36,6 @@ export const mutations = {
     state.email = ''
     state.fireid = ''
     state.profileImage = ''
-
   },
   setFireID (state, value) {
     state.fireid = value

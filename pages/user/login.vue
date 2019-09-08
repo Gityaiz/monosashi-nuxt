@@ -3,7 +3,7 @@
 </template>
 <script>
 import LoginForm from '../../components/LoginForm.vue'
-import firebase from '~/plugins/firebase.js'
+import firebase from '../../plugins/firebase.js'
 
 export default {
   components: {
@@ -16,7 +16,7 @@ export default {
   },
   middleware: 'must-not-be-authenticated',
   methods: {
-    async LoginSuccess (data) {
+    LoginSuccess (data) {
       // storeにログイン情報をセット
       this.$store.dispatch('auth/setName', '名無し')
       this.$store.dispatch('auth/setEmail', data.user.email)
@@ -25,7 +25,7 @@ export default {
       this.$store.dispatch('snackbar/snackOn')
 
       // ここでユーザー情報を取得する
-      await firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
+      return firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
         .get()
         .then(doc => {
           if (doc.exists) {
