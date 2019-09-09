@@ -46,10 +46,19 @@ export default {
       profileImage: ''
     }
   },
+  computed: {
+    ...mapActions("auth", [
+      "fireid",
+    ]),
+  },
   methods: {
+    ...mapActions("snackbar", ["setMessage"]),
+    ...mapActions("snackbar", ["snackOn"]),
+    ...mapActions("auth", ["setName"]),
+    ...mapActions("auth", ["setProfileImage"]),
     getStatus () {
       if (this.isfirst) {
-        firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
+        firebase.firestore().collection('users').doc(this.fireid)
           .get()
           .then(doc => {
             if (doc.exists) {
@@ -58,8 +67,8 @@ export default {
                 this.isfirst = false
             } else {
                 // doc.data() will be undefined in this case
-                this.$store.dispatch('snackbar/setMessage', 'エラーが発生しました')
-                this.$store.dispatch('snackbar/snackOn')
+                this.setMessage('エラーが発生しました')
+                this.snackOn()
             }
         })
       } else {
@@ -70,13 +79,13 @@ export default {
       if (this.user_infos.name === this.update.name || this.update.name === '') {
         return
       }
-      firebase.firestore().collection('users').doc(this.$store.state.auth.fireid)
+      firebase.firestore().collection('users').doc(this.fireid)
         .update({
           name: this.update.name 
         }).then(data => {
-          this.$store.dispatch('auth/setName', this.update.name)
-          this.$store.dispatch('snackbar/setMessage', 'ユーザ名を更新しました')
-          this.$store.dispatch('snackbar/snackOn')
+          this.setName(this.update.name)
+          this.setMessage('ユーザ名を更新しました')
+          this.snackOn()
         })
     },
     selectFile (e) {
@@ -89,7 +98,7 @@ export default {
         return
       }
 
-      const storepath = 'userProfile' + '/' + this.$store.state.auth.fireid + '/' + this.profileImage.name
+      const storepath = 'userProfile' + '/' + this.fireid + '/' + this.profileImage.name
       await firebase.storage().ref().child(storepath).put(this.profileImage)
       .then((snapshot) => {
         // 成功時の処理
@@ -99,13 +108,13 @@ export default {
         .child(storepath).getDownloadURL().then((url) => {
           imageUrl = url
         })
-      await firebase.firestore().collection('users').doc(this.$store.state.auth.fireid).set({
+      await firebase.firestore().collection('users').doc(this.fireid).set({
         profileImage: imageUrl
       }, {merge: true})
 
-      this.$store.dispatch('auth/setProfileImage', imageUrl)
-      this.$store.dispatch('snackbar/setMessage', 'プロフィール画像を更新しました')
-      this.$store.dispatch('snackbar/snackOn')
+      this.setProfileImage()
+      this.setMessage('プロフィール画像を更新しました')
+      this.snackOn()
       this.$router.push({path: '/'})
     }
   }

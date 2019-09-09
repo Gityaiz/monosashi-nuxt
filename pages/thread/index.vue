@@ -12,7 +12,7 @@
           <v-text-field
             id="testing"
             label="名前"
-            :value="$store.state.auth.name"
+            :value="name"
             disabled
           >
           </v-text-field>
@@ -68,6 +68,7 @@
 
 <script>
 import firebase from '~/plugins/firebase.js'
+import { mapGetters, mapActions } from 'vuex'
 
 export default {
   data () {
@@ -84,11 +85,22 @@ export default {
     }
   },
   computed: {
+    ...mapGetters('auth', [
+      'name',
+      'email', 
+      'fireid',
+      'profileImage'
+    ]),
+    ...mapGetters('contents', [
+      'topic', 
+    ]),
   },
   mounted () {
-    this.searchThread(this.$store.state.contents.topic)
+    this.searchThread(this.topic)
   },
   methods: {
+    ...mapActions("snackbar", ["setMessage"]),
+    ...mapActions("snackbar", ["snackOn"]),
     addComment () {
       console.log('sendMessage => ', this.sendMessage)
       // 送信時のEnterが入ってしまうためnullとならないので改行を削除する
@@ -98,16 +110,16 @@ export default {
         return
       }
 
-      if (this.$store.state.auth.fireid === '') {
+      if (this.fireid === '') {
         console.log('not authenticated')
         this.sendMessage = ''
         return
       }
       firebase.firestore().collection('chat-room').doc(this.openedTopic)
         .collection('messages').doc().set({
-          author: this.$store.state.auth.name,
-          authorid: this.$store.state.auth.fireid,
-          profileImage: this.$store.state.auth.profileImage,
+          author: this.name,
+          authorid: this.fireid,
+          profileImage: this.profileImage,
           message: this.sendMessage,
           timestamp: new Date()
         })
@@ -154,9 +166,9 @@ export default {
         .then(documentSnapshot => {
           if (!documentSnapshot.exists) {
             // 未ログイン状態の場合スレッドの作成は認めない
-            if ( this.$store.state.auth.fireid === '') {
-              this.$store.dispatch('snackbar/setMessage', '新しいスレッドの作成はログイン済みの状態で行なってください')
-              this.$store.dispatch('snackbar/snackOn')
+            if ( this.fireid === '') {
+              this.setMessage('新しいスレッドの作成はログイン済みの状態で行なってください')
+              this.snackOn()
               this.$router.push({path: '/'})
               return
             }
@@ -166,15 +178,15 @@ export default {
               updated: new Date(),
             })
             firebase.firestore().collection('chat-room').doc(keyword).collection('messages').doc().set({
-              author: this.$store.state.auth.name,
-              authorid: this.$store.state.auth.fireid,
-              profileImage: this.$store.state.auth.profileImage,
+              author: this.name,
+              authorid: this.fireid,
+              profileImage: this.profileImage,
               message: 'スレッドを作成しました',
               timestamp: new Date()
             })
 
-            this.$store.dispatch('snackbar/setMessage', '新たにスレッドを作成しました')
-            this.$store.dispatch('snackbar/snackOn')
+            this.setMessage('新たにスレッドを作成しました')
+            this.snackOn()
             this.openThread(keyword)
             return
           } else {

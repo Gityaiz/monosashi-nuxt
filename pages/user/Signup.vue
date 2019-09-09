@@ -8,20 +8,22 @@ export default {
     SignupForm
   },
   methods: {
+    ...mapActions("snackbar", ["setMessage"]),
+    ...mapActions("snackbar", ["snackOn"]),
     successSignup ( data ) {
-      this.$store.dispatch('snackbar/setMessage', 'ユーザーの作成に成功しました')
-      this.$store.dispatch('snackbar/snackOn')
+      this.setMessag('ユーザーの作成に成功しました')
+      this.snackOn()
       this.$router.push({path: '/user/login'})
     },
     failedSignup ( data ) {
       if (data == 'any is blank') {
-        this.$store.dispatch('snackbar/setMessage', '必要事項を埋めてください')
-        this.$store.dispatch('snackbar/snackOn')
+        this.setMessage('必要事項を埋めてください')
+        this.snackOn()
       }
 
       if( data == 'password differs from confirm') {
-        this.$store.dispatch('snackbar/setMessage', 'パスワードと確認パスワードが異なります')
-        this.$store.dispatch('snackbar/snackOn')
+        this.setMessage('パスワードと確認パスワードが異なります')
+        this.snackOn()
       }
     },
   }

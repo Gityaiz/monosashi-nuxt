@@ -42,6 +42,7 @@
 
 <script>
 import firebase from '~/plugins/firebase.js'
+import { mapActions } from 'vuex'
 
 export default {
   data () {
@@ -72,9 +73,10 @@ export default {
 			})
 },
   methods: {
+    ...mapActions("contents", ["setTopic"]),
     jumpToThreadPage (Keyword) {
 			// ストアに検索キーワードをセットしてスレッドページに移動
-			this.$store.dispatch('contents/setTopic', Keyword)
+			this.setTopic(Keyword)
 			this.searchKeyword = ''
 			this.$router.push({path: '/thread/'})
     },
