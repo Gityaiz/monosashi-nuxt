@@ -7,7 +7,6 @@ import firebase from '../../../plugins/firebase.js'
 
 jest.mock('../../../plugins/firebase.js')
 
-
 // localVueを使用するとVuetifyのバグでwarningが出るのでVueを使用する
 // let wrapper;
 // const localVue = createLocalVue()
@@ -64,6 +63,13 @@ describe('LoginForm.vue', () => {
     ])
   })
   it('異常系: ユーザ名が空のとき - failedイベントを発行(data: username or password is blank)', () => {
+    // firebase.authのmockを作成
+    firebase.auth.mockReturnValue({
+      signInWithEmailAndPassword: (username, password) => Promise.reject({
+        username: username,
+        password: password
+      })
+    });
 		let callTime = firebase.auth.mock.calls.length;
     wrapper.vm.loginAction('', 'valid_password');
     
@@ -73,6 +79,13 @@ describe('LoginForm.vue', () => {
   })
 
   it('異常系: パスワードが空のとき - failedイベントを発行(data: username or password is blank)', () => {
+    // firebase.authのmockを作成
+    firebase.auth.mockReturnValue({
+      signInWithEmailAndPassword: (username, password) => Promise.reject({
+        username: username,
+        password: password
+      })
+    });
 		let callTime = firebase.auth.mock.calls.length;
     wrapper.vm.loginAction('valid_username', '');
     // 認証が実行されていないことを検証

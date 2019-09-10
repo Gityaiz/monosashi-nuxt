@@ -58,7 +58,7 @@ export default {
   methods: {
     loginAction (username, password) {
       if (username === '' || password === '') {
-          this.$emit('failed', 'username or password is blank');
+        this.$emit('failed', 'username or password is blank');
         return
       }
       return firebase.auth().signInWithEmailAndPassword(username, password)

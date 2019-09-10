@@ -6,11 +6,11 @@
         <router-link to="/" class="toolbar-font">{{ title }}</router-link>
       </v-toolbar-title>
       <v-spacer></v-spacer>
-      <router-link to="/user/login" v-if="this.email == ''" class="toolbar-font">ログイン</router-link>
+      <router-link to="/user/login" v-if="email == ''" class="toolbar-font">ログイン</router-link>
       <v-menu
         bottom
         offset-y
-        v-if="!this.email == ''"
+        v-if="email != ''"
       >
         <template v-slot:activator="{ on }">
           <v-btn
@@ -18,7 +18,7 @@
             text
             depressed
             class="toolbar-font"
-          >{{ this.email }} </v-btn>
+          >{{ email }} </v-btn>
         </template>
         <v-list
           v-for="(item, i) in userItems"
@@ -29,7 +29,7 @@
           </v-list-tile>
         </v-list>
       </v-menu>
-      <router-link to='/user' v-else  class="toolbar-font">{{ this.email }} </router-link>
+      <router-link to='/user' v-else  class="toolbar-font">{{ email }} </router-link>
     </v-toolbar>
     <v-snackbar
       top
@@ -56,6 +56,13 @@ import firebase from '~/plugins/firebase.js'
 import { mapGetters, mapActions } from 'vuex'
 export default {
   computed: {
+    ...mapGetters('auth', [
+      'email', 
+    ]),
+    ...mapGetters('snackbar', [
+      'message', 
+      'status'
+    ]),
     // snackbarが自動でfalseに設定するためセッタを用意して、明示的にdispatchからOffするようにする
     snackbarVisible: {
       get() {
@@ -65,13 +72,6 @@ export default {
         return this.snackOff()
       }
     },
-    ...mapGetters('auth', [
-      'email', 
-    ]),
-    ...mapGetters('snackbar', [
-      'message', 
-      'isEnable'
-    ]),
   },
   data() {
     return {

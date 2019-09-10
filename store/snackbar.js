@@ -1,11 +1,11 @@
 export const state = () => ({
-  isEnable: false,
+  status: false,
   message: ''
 })
 
 export const getters = {
   status: state => {
-    return state.isEnable
+    return state.status
   },
   message: state => {
     return state.message
@@ -14,10 +14,10 @@ export const getters = {
 
 export const mutations = {
   setenable (state) {
-    state.isEnable = true
+    state.status = true
   },
   setdisable (state) {
-    state.isEnable = false
+    state.status = false
   },
   setMessage (state, message) {
     state.message = message

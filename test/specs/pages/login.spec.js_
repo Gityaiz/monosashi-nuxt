@@ -1,0 +1,129 @@
+// import Vuetify from 'vuetify'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
+import Login from '../../../pages/user/login.vue'
+import Vuex from 'vuex'
+// import VueRouter from 'vue-router'
+// import VueRouter from 'vue-router'
+import firebase from '../../../plugins/firebase.js'
+
+jest.mock('../../../plugins/firebase.js')
+
+const localVue = createLocalVue();
+localVue.use(Vuex)
+// localVue.use(VueRouter)
+// localVue.use(Vuetify)
+
+describe('Login.vue', () => {
+
+	let state
+	let getters
+	let actions
+	let snack_state
+	let snack_getters
+	let snack_actions
+	let store
+	let $router
+
+	beforeEach(() => {
+		state = {
+			name: 'initial-name',
+			email: 'initial-email',
+			fireid: 'initial-fireid',
+			profileImage: 'initial-profileImage'
+		}
+		getters = {
+			name: state => {
+				return state.name
+			},
+			email: state => {
+				return state.email
+			},
+			fireid: state => {
+				return state.fireid
+			},
+			profileImage: state => {
+				return state.profileImage
+			},
+		}
+		actions = {
+			setName: jest.fn().mockImplementation( scalar => auth_state.name = scalar),
+			setEmail: jest.fn().mockImplementation( scalar => auth_state.email = scalar),
+			setFireID: jest.fn().mockImplementation( scalar => auth_state.fireid = scalar),
+		}
+
+		// snack_state = {
+		// 	isEnable: false,
+		// 	message: 'initial-message',
+		// }
+		// snack_getters = {
+		// 	status: snack_state => {
+		// 		return snack_state.isEnable
+		// 	},
+		// 	message: snack_state => {
+		// 		return snack_state.message
+		// 	},
+		// }
+		// snack_actions = {
+		// 	snackOn: jest.fn().mockImplementation( () => snack_state.isEnable = true),
+		// 	snackOff: jest.fn().mockImplementation( () => snack_state.isEnable = false),
+		// 	setMessage: jest.fn().mockImplementation( scalar => snack_state.message = scalar),
+		// }
+
+		store = new Vuex.Store({
+			modules: {
+				auth: {
+					namespaced: true,
+					state,
+					getters,
+					actions,
+				},
+				// snackbar: {
+				// 	namespaced: true,
+				// 	snack_state,
+				// 	snack_getters,
+				// 	snack_actions,
+				// },
+			}
+		})
+		$router = {
+			push: jest.fn().mockImplementation( dist => {console.log(dist)})
+		}
+	})
+
+	it('Vueのインスタンスであること', () => {
+		const wrapper = shallowMount(Login, {store, localVue})
+		expect(wrapper.isVueInstance()).toBeTruthy();
+	})
+
+	it('LoginSuccessが正常に動作すること', async () => {
+		// loginSuccess内部で呼び出しているfirebase関数をmock化
+		const documentReferenceMock = {
+				get: () => Promise.resolve({
+					exists: true,
+					data: function () {
+						return {
+							name: 'returned name',
+							profileImage: 'returned profileImage'
+						}
+					}
+			})
+		}
+		const collectionReferenceMock = {
+			doc: () => documentReferenceMock
+		}
+		const firestoreMock = {
+			collection: () => collectionReferenceMock
+		}
+		firebase.firestore.mockReturnValue(firestoreMock);
+		
+		// loginSuccessが引数に受け取るdataのダミーデータを作成
+		const data = {
+			user: {
+				email: 'received argument: user.email in data',
+				uid: 'received argument: user.uid in data'
+			}
+		}
+		const wrapper = shallowMount(Login, $router, {store, localVue})
+		await wrapper.vm.LoginSuccess( data )
+	})
+})
