@@ -1,8 +1,9 @@
 <template>
-  <signup-form @success="successSignup" @failed="failedSignUp"></signup-form>
+  <signup-form @success="SignupSuccess" @failed="SignupFailed"></signup-form>
 </template>
 <script>
 import SignupForm from '../../components/SignupForm.vue'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   components: {
     SignupForm
@@ -10,12 +11,13 @@ export default {
   methods: {
     ...mapActions("snackbar", ["setMessage"]),
     ...mapActions("snackbar", ["snackOn"]),
-    successSignup ( data ) {
-      this.setMessag('ユーザーの作成に成功しました')
+    
+    SignupSuccess ( data ) {
+      this.setMessage('ユーザーの作成に成功しました')
       this.snackOn()
       this.$router.push({path: '/user/login'})
     },
-    failedSignup ( data ) {
+    SignupFailed ( data ) {
       if (data == 'any is blank') {
         this.setMessage('必要事項を埋めてください')
         this.snackOn()

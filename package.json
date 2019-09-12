@@ -33,7 +33,7 @@
     "@nuxtjs/vuetify": "0.5.5",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
     "firebase": "^6.2.4",
-    "firebase-tools": "^7.0.2",
+    "firebase-tools": "^7.3.2",
     "nuxt": "^2.0.0",
     "vuex-persistedstate": "^2.5.4"
   },

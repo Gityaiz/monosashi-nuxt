@@ -1,12 +1,10 @@
 import { shallowMount, createLocalVue } from '@vue/test-utils'
-import Login from '../../../pages/user/login.vue'
-import firebase from '../../../plugins/firebase.js'
-import * as Auth from '../../../store/auth'
-import * as Snack from '../../../store/snackbar'
+import Login from '../../../../pages/user/login.vue'
+import firebase from '../../../../plugins/firebase.js'
 import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 
-jest.mock('../../../plugins/firebase.js')
+jest.mock('../../../../plugins/firebase.js')
 jest.mock('vuex')
 
 const localVue = createLocalVue();
@@ -39,11 +37,11 @@ describe('Login.vue', () => {
 		return firestoreMock;
 	}
 
-  beforeEach(() => {
-		
+	beforeEach(() => {
+
 		router = new VueRouter()
-		
-		wrapper = shallowMount(Login, {router, localVue })
+
+		wrapper = shallowMount(Login, { router, localVue })
 
 		wrapper.vm.setName = jest.fn()
 		wrapper.vm.setEmail = jest.fn()
@@ -60,7 +58,7 @@ describe('Login.vue', () => {
 	})
 
 	it('successイベントが発生。LoginSuccessが正常に動作すること', async () => {
-		
+
 		// loginSuccess内部で呼び出しているfirebase関数をmock化
 		const firestoreMock = buildFirestoreMock(() => Promise.resolve({
 			exists: true,
@@ -75,7 +73,7 @@ describe('Login.vue', () => {
 		// firebaseをmock化
 		firebase.firestore.mockReturnValue(firestoreMock)
 
-		await wrapper.vm.LoginSuccess( data )
+		await wrapper.vm.LoginSuccess(data)
 
 		expect(wrapper.vm.setName.mock.calls.length).toBe(2)
 		expect(wrapper.vm.setName.mock.calls[0][0]).toBe('名無し')
@@ -98,16 +96,18 @@ describe('Login.vue', () => {
 	})
 
 	it('successイベントが発生。firebase上にユーザー情報が存在しなかったときエラーを表示すること', async () => {
-		
-		// loginSuccess内部で呼び出しているfirebase関数をmock化
-		const firestoreMock = buildFirestoreMock(() => Promise.resolve({
+
+		const mockFn = jest.fn(() => Promise.resolve({
 			exists: false
 		}))
+		// loginSuccess内部で呼び出しているfirebase関数をmock化
+		const firestoreMock = buildFirestoreMock(mockFn)
 
 		// firebaseをmock化
 		firebase.firestore.mockReturnValue(firestoreMock)
 
-		await wrapper.vm.LoginSuccess( data )
+		await wrapper.vm.LoginSuccess(data)
+		expect(mockFn.mock.calls.length).toBe
 
 		expect(wrapper.vm.setName.mock.calls.length).toBe(1)
 		expect(wrapper.vm.setName.mock.calls[0][0]).toBe('名無し')
@@ -126,9 +126,9 @@ describe('Login.vue', () => {
 		expect(wrapper.vm.snackOn.mock.calls.length).toBe(1)
 		expect(wrapper.vm.snackOn.mock.calls[0][0]).toBeFalsy()
 	})
-	
+
 	it('failedイベントが発生してLoginFailedが実行', async () => {
-		await wrapper.vm.LoginFailed( data )
+		await wrapper.vm.LoginFailed(data)
 
 		expect(wrapper.vm.setName.mock.calls.length).toBe(0)
 
