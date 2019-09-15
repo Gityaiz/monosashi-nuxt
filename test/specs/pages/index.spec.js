@@ -120,7 +120,6 @@ describe('index.vue', () => {
 		wrapper.vm.setTopic = jest.fn()
 
 		wrapper.vm.jumpToThreadPage('test')
-		console.log(firebase.firestore().get.mock.calls.length)
 		expect(wrapper.vm.setTopic.mock.calls.length).toBe(1)
 		expect(wrapper.vm.setTopic.mock.calls[0][0]).toBe('test')
 

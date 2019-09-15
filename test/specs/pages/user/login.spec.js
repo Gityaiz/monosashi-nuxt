@@ -23,19 +23,11 @@ describe('Login.vue', () => {
 		}
 	}
 
-	function buildFirestoreMock(getFn) {
-		// loginSuccess内部で呼び出しているfirebase関数をmock化
-		const documentReferenceMock = {
-			get: getFn
-		}
-		const collectionReferenceMock = {
-			doc: () => documentReferenceMock
-		}
-		const firestoreMock = {
-			collection: () => collectionReferenceMock
-		}
-		return firestoreMock;
-	}
+	firebase.firestore.mockReturnValue({
+		collection: jest.fn().mockReturnThis(),
+		doc: jest.fn().mockReturnThis(),
+		get: jest.fn().mockReturnValue( Promise.resolve('returned URL') ),
+	})
 
 	beforeEach(() => {
 
@@ -59,19 +51,20 @@ describe('Login.vue', () => {
 
 	it('successイベントが発生。LoginSuccessが正常に動作すること', async () => {
 
-		// loginSuccess内部で呼び出しているfirebase関数をmock化
-		const firestoreMock = buildFirestoreMock(() => Promise.resolve({
-			exists: true,
-			data: function () {
-				return {
-					name: 'returned name',
-					profileImage: 'returned profileImage'
-				}
-			}
-		}))
-
 		// firebaseをmock化
-		firebase.firestore.mockReturnValue(firestoreMock)
+		firebase.firestore.mockReturnValue({
+			collection: jest.fn().mockReturnThis(),
+			doc: jest.fn().mockReturnThis(),
+			get: jest.fn().mockReturnValue( Promise.resolve({
+				exists: true,
+				data: function () {
+					return {
+						name: 'returned name',
+						profileImage: 'returned profileImage'
+					}
+				}
+			})),
+		})
 
 		await wrapper.vm.LoginSuccess(data)
 
@@ -96,18 +89,17 @@ describe('Login.vue', () => {
 	})
 
 	it('successイベントが発生。firebase上にユーザー情報が存在しなかったときエラーを表示すること', async () => {
-
-		const mockFn = jest.fn(() => Promise.resolve({
-			exists: false
-		}))
-		// loginSuccess内部で呼び出しているfirebase関数をmock化
-		const firestoreMock = buildFirestoreMock(mockFn)
-
 		// firebaseをmock化
-		firebase.firestore.mockReturnValue(firestoreMock)
+		firebase.firestore.mockReturnValue({
+			collection: jest.fn().mockReturnThis(),
+			doc: jest.fn().mockReturnThis(),
+			get: jest.fn().mockReturnValue( Promise.resolve({
+				exists: false
+			})),
+		})
 
 		await wrapper.vm.LoginSuccess(data)
-		expect(mockFn.mock.calls.length).toBe
+		expect(firebase.firestore().get.mock.calls.length).toBe(1)
 
 		expect(wrapper.vm.setName.mock.calls.length).toBe(1)
 		expect(wrapper.vm.setName.mock.calls[0][0]).toBe('名無し')

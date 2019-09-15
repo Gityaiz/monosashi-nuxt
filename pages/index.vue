@@ -62,22 +62,13 @@ export default {
     };
   },
   created() {
-    firebase
-      .storage()
-      .ref()
-      .child("public/plane.png")
-      .getDownloadURL()
+    firebase.storage().ref().child("public/plane.png").getDownloadURL()
       .then(url => {
         this.topImageUrl = url;
         this.loading = false;
       });
     // 最新更新スレッド上位６つを取得（スレッドが６つに満たない場合は存在するスレッドのみ取得）
-    firebase
-      .firestore()
-      .collection("chat-room")
-      .orderBy("updated", "desc")
-      .limit(6)
-      .get()
+    firebase.firestore().collection("chat-room").orderBy("updated", "desc").limit(6).get()
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           // doc.data() is never undefined for query doc snapshots

@@ -31,7 +31,8 @@
 </template>
 
 <script>
-import firebase from '~/plugins/firebase.js'
+import firebase from '../../plugins/firebase.js'
+import { mapGetters, mapActions } from 'vuex'
 export default {
   middleware: 'must-be-authenticated',
   data () {
@@ -47,7 +48,7 @@ export default {
     }
   },
   computed: {
-    ...mapActions("auth", [
+    ...mapGetters("auth", [
       "fireid",
     ]),
   },
@@ -58,17 +59,17 @@ export default {
     ...mapActions("auth", ["setProfileImage"]),
     getStatus () {
       if (this.isfirst) {
-        firebase.firestore().collection('users').doc(this.fireid)
+        return firebase.firestore().collection('users').doc(this.fireid)
           .get()
           .then(doc => {
             if (doc.exists) {
-                this.user_infos = doc.data()
-                this.isVisible = !this.isVisible
-                this.isfirst = false
+              this.user_infos = doc.data()
+              this.isVisible = !this.isVisible
+              this.isfirst = false
             } else {
-                // doc.data() will be undefined in this case
-                this.setMessage('エラーが発生しました')
-                this.snackOn()
+              // doc.data() will be undefined in this case
+              this.setMessage('エラーが発生しました')
+              this.snackOn()
             }
         })
       } else {
@@ -93,29 +94,31 @@ export default {
       let files = e.target.files;
       this.profileImage = files[0];
     },
-    async updateProfileImage () {
+    updateProfileImage () {
       if ( this.profileImage === '' ) {
         return
       }
 
       const storepath = 'userProfile' + '/' + this.fireid + '/' + this.profileImage.name
-      await firebase.storage().ref().child(storepath).put(this.profileImage)
-      .then((snapshot) => {
-        // 成功時の処理
-      })
-      let imageUrl
-      await firebase.storage().ref()
-        .child(storepath).getDownloadURL().then((url) => {
-          imageUrl = url
+      return firebase.storage().ref().child(storepath).put(this.profileImage)
+        .then((snapshot) => {
+          // 成功時の処理
+          let imageUrl
+          firebase.storage().ref().child(storepath).getDownloadURL().then((url) => {
+            imageUrl = url
+          })
+            .then(() => {
+              firebase.firestore().collection('users').doc(this.fireid).set({
+                profileImage: imageUrl
+              }, {merge: true})
+            })
         })
-      await firebase.firestore().collection('users').doc(this.fireid).set({
-        profileImage: imageUrl
-      }, {merge: true})
-
-      this.setProfileImage()
-      this.setMessage('プロフィール画像を更新しました')
-      this.snackOn()
-      this.$router.push({path: '/'})
+        .then(() => {
+          this.setProfileImage()
+          this.setMessage('プロフィール画像を更新しました')
+          this.snackOn()
+          this.$router.push({path: '/'})
+        })
     }
   }
 }
