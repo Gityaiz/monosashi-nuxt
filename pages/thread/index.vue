@@ -36,7 +36,7 @@
               outline
               color="primary"
               round
-              @click="addComment()"
+              @click="addComment(sendMessage)"
             >
               投稿
             </v-btn>
@@ -67,7 +67,7 @@
 </template>
 
 <script>
-import firebase from '~/plugins/firebase.js'
+import firebase from '../../plugins/firebase.js'
 import { mapGetters, mapActions } from 'vuex'
 
 export default {
@@ -101,36 +101,32 @@ export default {
   methods: {
     ...mapActions("snackbar", ["setMessage"]),
     ...mapActions("snackbar", ["snackOn"]),
-    addComment () {
-      console.log('sendMessage => ', this.sendMessage)
+    addComment ( message ) {
       // 送信時のEnterが入ってしまうためnullとならないので改行を削除する
-      this.sendMessage = this.sendMessage.replace(/\r?\n/g, '');
-      if (this.sendMessage === '') {
-        console.log('sendMessage => null')
+      message = message.replace(/\r?\n/g, '');
+      if ( message === '') {
         return
       }
 
       if (this.fireid === '') {
-        console.log('not authenticated')
         this.sendMessage = ''
         return
       }
-      firebase.firestore().collection('chat-room').doc(this.openedTopic)
-        .collection('messages').doc().set({
-          author: this.name,
-          authorid: this.fireid,
-          profileImage: this.profileImage,
-          message: this.sendMessage,
-          timestamp: new Date()
-        })
-
+      return firebase.firestore().collection('chat-room').doc(this.openedTopic).collection('messages').doc().set({
+        author: this.name,
+        authorid: this.fireid,
+        profileImage: this.profileImage,
+        message: this.sendMessage,
+        timestamp: new Date()
+      })
+      .then(() => {
         // スレッドの最終更新日時をアップデート
         firebase.firestore().collection('chat-room').doc(this.openedTopic).set({
           updated: new Date(),
         }, {merge: true})
-
-      // 投稿メッセージは空にする    
-      this.sendMessage = ''
+        // 投稿メッセージは空にする    
+        this.sendMessage = ''
+      })
     },
     initInfo () {
       this.threadData = []
@@ -162,7 +158,7 @@ export default {
       if (keyword === '') {
         return
       }
-      firebase.firestore().collection('chat-room').doc(keyword).get()
+      return firebase.firestore().collection('chat-room').doc(keyword).get()
         .then(documentSnapshot => {
           if (!documentSnapshot.exists) {
             // 未ログイン状態の場合スレッドの作成は認めない
@@ -170,7 +166,6 @@ export default {
               this.setMessage('新しいスレッドの作成はログイン済みの状態で行なってください')
               this.snackOn()
               this.$router.push({path: '/'})
-              return
             }
             // スレッドの最終更新日時をアップデート
             firebase.firestore().collection('chat-room').doc(keyword).set({
@@ -188,7 +183,6 @@ export default {
             this.setMessage('新たにスレッドを作成しました')
             this.snackOn()
             this.openThread(keyword)
-            return
           } else {
             // 未ログイン状態であってもスレッドメッセージの読み込みは許可する（特に条件分岐しない）
             this.openThread(keyword)
