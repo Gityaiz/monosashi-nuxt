@@ -124,8 +124,18 @@ export default {
         firebase.firestore().collection('chat-room').doc(this.openedTopic).set({
           updated: new Date(),
         }, {merge: true})
-        // 投稿メッセージは空にする    
-        this.sendMessage = ''
+          .then(() => {
+            // 投稿メッセージは空にする    
+            this.sendMessage = ''     
+          })
+          .catch(() => {
+            // スレッドの最終更新日時が更新されないだけなため、特にエラーは処理しない
+          })
+      })
+      .catch(() => {
+        // リファレンスを見る限りここにはいってこない
+        this.setMessage('コメント投稿に失敗しました')
+        this.snackOn()
       })
     },
     initInfo () {
@@ -187,6 +197,10 @@ export default {
             // 未ログイン状態であってもスレッドメッセージの読み込みは許可する（特に条件分岐しない）
             this.openThread(keyword)
           }
+      })
+      .catch(() => {
+        this.setMessage('スレッドが見つかりませんでした')
+        this.snackOn()
       })
     },
     submitSearchKeyword () {

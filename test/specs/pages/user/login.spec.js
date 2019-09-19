@@ -113,7 +113,7 @@ describe('Login.vue', () => {
 		expect(wrapper.vm.setProfileImage.mock.calls.length).toBe(0)
 
 		expect(wrapper.vm.setMessage.mock.calls.length).toBe(1)
-		expect(wrapper.vm.setMessage.mock.calls[0][0]).toBe('エラーが発生しました')
+		expect(wrapper.vm.setMessage.mock.calls[0][0]).toBe('ユーザーが存在しませんでした')
 
 		expect(wrapper.vm.snackOn.mock.calls.length).toBe(1)
 		expect(wrapper.vm.snackOn.mock.calls[0][0]).toBeFalsy()

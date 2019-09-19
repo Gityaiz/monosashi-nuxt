@@ -124,8 +124,13 @@ export default {
       }
 
       if (selectedMenu === 'ログアウト') {
+<<<<<<< HEAD
         firebase.auth().signOut()
           .then(data => {
+=======
+        return firebase.auth().signOut()
+          .then(() => {
+>>>>>>> for-master-deploy
             this.setLogOut()
             this.setMessage('ログアウトしました')
             this.snackOn()

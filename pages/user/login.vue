@@ -44,10 +44,14 @@ export default {
             this.$router.push({path: '/'})
           } else {
               // doc.data() will be undefined in this case
-              this.setMessage('エラーが発生しました')
+              this.setMessage('ユーザーが存在しませんでした')
               this.snackOn()
               return
           }
+        })
+        .catch(() => {
+          this.setMessage('ユーザー情報の取得中にエラーが発生しました')
+          this.snackOn()
         })
     },
     LoginFailed (data) {

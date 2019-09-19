@@ -62,13 +62,27 @@ export default {
     };
   },
   created() {
+<<<<<<< HEAD
+=======
+    // top画像をストレージから取得
+>>>>>>> for-master-deploy
     firebase.storage().ref().child("public/plane.png").getDownloadURL()
       .then(url => {
         this.topImageUrl = url;
         this.loading = false;
+<<<<<<< HEAD
       });
     // 最新更新スレッド上位６つを取得（スレッドが６つに満たない場合は存在するスレッドのみ取得）
     firebase.firestore().collection("chat-room").orderBy("updated", "desc").limit(6).get()
+=======
+      })
+      .catch((error) => {
+        this.setMessage('top画像を取得できませんでした')
+        this.snackOn()
+      })
+    // 最新更新スレッド上位６つを取得（スレッドが６つに満たない場合は存在するスレッドのみ取得）
+    firebase.firestore().collection("chat-room").orderBy("updated", "esc").limit(6).get()
+>>>>>>> for-master-deploy
       .then(querySnapshot => {
         querySnapshot.forEach(doc => {
           // doc.data() is never undefined for query doc snapshots
@@ -76,10 +90,23 @@ export default {
             name: doc.id
           });
         });
+<<<<<<< HEAD
       });
   },
   methods: {
     ...mapActions("contents", ["setTopic"]),
+=======
+      })
+      .catch((error) => {
+        this.setMessage('最新スレッドが取得できませんでした')
+        this.snackOn()
+      })
+  },
+  methods: {
+    ...mapActions("contents", ["setTopic"]),
+    ...mapActions("snackbar", ["setMessage"]),
+    ...mapActions("snackbar", ["snackOn"]),
+>>>>>>> for-master-deploy
     jumpToThreadPage(Keyword) {
       // ストアに検索キーワードをセットしてスレッドページに移動
       this.setTopic(Keyword);

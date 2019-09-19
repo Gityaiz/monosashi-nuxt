@@ -85,7 +85,7 @@ describe('index.vue', () => {
 		expect(firebase.storage().child.mock.calls[0][0]).toBe('public/plane.png')
 		expect(firebase.firestore().collection.mock.calls[0][0]).toBe('chat-room')
 		expect(firebase.firestore().orderBy.mock.calls[0][0]).toBe('updated')
-		expect(firebase.firestore().orderBy.mock.calls[0][1]).toBe('desc')
+		expect(firebase.firestore().orderBy.mock.calls[0][1]).toBe('esc')
 		expect(firebase.firestore().limit.mock.calls[0][0]).toBe(6)
 
 	})
