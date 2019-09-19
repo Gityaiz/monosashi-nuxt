@@ -72,6 +72,10 @@ export default {
               this.snackOn()
             }
         })
+        .catch(() => {
+          this.setMessage('ユーザー情報が取得できませんでした')
+          this.snackOn()
+        })
       } else {
         this.isVisible = !this.isVisible
       }
@@ -83,9 +87,14 @@ export default {
       firebase.firestore().collection('users').doc(this.fireid)
         .update({
           name: this.update.name 
-        }).then(data => {
+        })
+        .then(data => {
           this.setName(this.update.name)
           this.setMessage('ユーザ名を更新しました')
+          this.snackOn()
+        })
+        .catch(() => {
+          this.setMessage('ユーザー情報の更新でエラーが発生しました')
           this.snackOn()
         })
     },
@@ -118,6 +127,10 @@ export default {
           this.setMessage('プロフィール画像を更新しました')
           this.snackOn()
           this.$router.push({path: '/'})
+        })
+        .catch(() => {
+          this.setMessage('プロフィール画像の更新中にエラーが発生しました')
+          this.snackOn()
         })
     }
   }
